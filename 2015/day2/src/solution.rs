@@ -1,5 +1,5 @@
 use std::io::{BufRead, BufReader, Write};
-//use std::cmp::max;
+use std::cmp::max;
 use std::cmp::min;
 //use regex::Regex;
 //use lazy_static::lazy_static;
@@ -45,6 +45,14 @@ impl Present {
 
         2 * (side1 + side2 + side3) + min_side
     }
+
+    fn ribbon_for_wrapping(&self) -> i64 {
+        2 * ((self.l + self.w + self.h) - max(self.l, max(self.w, self.h)))
+    }
+
+    fn ribbon_for_bow(&self) -> i64 {
+        self.l * self.w * self.h
+    }
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -72,7 +80,7 @@ impl Solution {
     }
 
     fn solve2(&self) -> i64 {
-        0
+        self.presents.iter().map(|p| p.ribbon_for_bow() + p.ribbon_for_wrapping()).sum()
     }
 }
 
@@ -145,6 +153,18 @@ mod tests {
         test_star1(
             "1x1x10",
             "43",
+        );
+    }
+
+    #[test]
+    fn sample_star2() {
+        test_star2(
+            "2x3x4",
+            "34",
+        );
+        test_star2(
+            "1x1x10",
+            "14",
         );
     }
 }
