@@ -9,6 +9,7 @@ use std::io::{BufRead, BufReader, Write};
 //use itertools::Itertools;
 //use std::collections::VecDeque;
 
+#[allow(unused_macros)]
 macro_rules! dprintln {
     ( $( $x:expr ),* ) => {
         {
@@ -23,8 +24,8 @@ struct Solution {
 }
 
 impl Solution {
-    fn from_input<I>(lines: I) -> Self
-        where I: Iterator<Item = String>
+    fn from_input<'a, I>(lines: I) -> Self
+        where I: Iterator<Item = &'a str>
     {
         for (y, l) in lines.enumerate() {
             let line = l.trim();
@@ -34,35 +35,67 @@ impl Solution {
         }
     }
 
-    fn solve(&self) -> i64 {
+    fn solve1(&self) -> i64 {
+        0
+    }
+
+    fn solve2(&self) -> i64 {
         0
     }
 }
 
-fn solve<R: BufRead, W: Write>(input: R, mut output: W) {
-    let lines_it = BufReader::new(input).lines().map(|l| l.unwrap());
-    let solution = Solution::from_input(lines_it);
+fn solve1<'a, I, W: Write>(input_lines: I, mut output: W)
+        where I: Iterator<Item = &'a str>
+{
+    let solution = Solution::from_input(input_lines);
 
-    writeln!(output, "{}", solution.solve()).unwrap();
+    writeln!(output, "{}", solution.solve1()).unwrap();
+}
+
+fn solve2<'a, I, W: Write>(input_lines: I, mut output: W)
+        where I: Iterator<Item = &'a str>
+{
+    let solution = Solution::from_input(input_lines);
+
+    writeln!(output, "{}", solution.solve2()).unwrap();
 }
 
 pub fn main() {
     let stdin = std::io::stdin();
     let stdout = std::io::stdout();
-    solve(stdin.lock(), stdout.lock());
+    
+    let input_lines: Vec<String> = BufReader::new(stdin.lock())
+        .lines().map(|l| l.unwrap()).collect();
+    solve1(input_lines.iter().map(AsRef::as_ref), stdout.lock());
+    solve2(input_lines.iter().map(AsRef::as_ref), stdout.lock());
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs::File;
 
-    fn test_ignore_whitespaces(input: &str, output: &str) {
-        let mut actual_out: Vec<u8> = Vec::new();
-        solve(input.as_bytes(), &mut actual_out);
+    fn assert_ignore_whitespaces(actual_out: Vec<u8>, output: &str) {
         let actual_out_str = String::from_utf8(actual_out).unwrap();
         let actual_outs = actual_out_str.split_whitespace().collect::<Vec<&str>>();
         let expected_outs = output.split_whitespace().collect::<Vec<&str>>();
         assert_eq!(actual_outs, expected_outs);
+    }
+
+    #[allow(dead_code)]
+    fn test_star1(input: &str, output: &str) {
+        let mut actual_out: Vec<u8> = Vec::new();
+        solve1(input.split('\n'), &mut actual_out);
+
+        assert_ignore_whitespaces(actual_out, output);
+    }
+
+    #[allow(dead_code)]
+    fn test_star2(input: &str, output: &str) {
+        let mut actual_out: Vec<u8> = Vec::new();
+        solve2(input.split('\n'), &mut actual_out);
+
+        assert_ignore_whitespaces(actual_out, output);
     }
 
     #[allow(dead_code)]
@@ -72,8 +105,8 @@ mod tests {
     }
 
     #[test]
-    fn sample() {
-        test_ignore_whitespaces(
+    fn sample_star1() {
+        test_star1(
             "",
             "0",
         );
