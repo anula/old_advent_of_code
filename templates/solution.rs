@@ -1,9 +1,13 @@
 use std::io::{BufRead, BufReader, Write};
-//use std::cmp::{max, min};
+//use std::cmp::max;
+//use std::cmp::min;
 //use regex::Regex;
 //use lazy_static::lazy_static;
 //use std::collections::HashSet;
 //use std::collections::HashMap;
+//use rand::Rng;
+//use itertools::Itertools;
+//use std::collections::VecDeque;
 
 macro_rules! dprintln {
     ( $( $x:expr ),* ) => {
@@ -37,7 +41,7 @@ impl Solution {
 
 fn solve<R: BufRead, W: Write>(input: R, mut output: W) {
     let lines_it = BufReader::new(input).lines().map(|l| l.unwrap());
-    let mut solution = Solution::from_input(lines_it);
+    let solution = Solution::from_input(lines_it);
 
     writeln!(output, "{}", solution.solve()).unwrap();
 }
@@ -59,6 +63,12 @@ mod tests {
         let actual_outs = actual_out_str.split_whitespace().collect::<Vec<&str>>();
         let expected_outs = output.split_whitespace().collect::<Vec<&str>>();
         assert_eq!(actual_outs, expected_outs);
+    }
+
+    #[allow(dead_code)]
+    fn official_input() -> std::io::Lines<BufReader<File>> {
+        let file = File::open("input").unwrap();
+        BufReader::new(file).lines()
     }
 
     #[test]

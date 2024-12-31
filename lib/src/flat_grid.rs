@@ -10,19 +10,14 @@ struct XY {
 
 #[allow(dead_code)]
 impl XY {
-    const AROUND: [XY; 4] = [
-        XY::new(0, -1),
-        XY::new(1, 0),
-        XY::new(0, 1),
-        XY::new(-1, 0),
-    ];
-
     const fn new(x: i64, y: i64) -> XY { XY {x, y} }
     const fn unew(x: usize, y: usize) -> XY { XY {x: x as i64, y: y as i64} }
 
     const fn add(&self, other: &XY) -> XY { XY { x: self.x + other.x, y: self.y + other.y } }
     const fn sub(&self, other: &XY) -> XY { XY { x: self.x - other.x, y: self.y - other.y } }
     const fn mul(&self, other: &XY) -> XY { XY { x: self.x * other.x, y: self.y * other.y } }
+
+    const fn smul(&self, s: i64) -> XY { XY { x: self.x * s, y: self.y * s } }
 
     const fn ux(&self) -> usize { self.x as usize }
     const fn uy(&self) -> usize { self.y as usize }
@@ -150,6 +145,17 @@ impl Grid {
         }
         &mut self.nodes[at.y as usize][at.x as usize]
     }
+
+    fn neighbours(&self, pos: &XY) -> Vec<XY> {
+        let mut neighs = vec![];
+        for dir in &Direction::ALL {
+            let candidate = pos.step(dir);
+            if self.is_within(&candidate) {
+                neighs.push(candidate);
+            }
+        }
+        neighs
+    }
 }
 
 #[cfg(test)]
@@ -189,6 +195,13 @@ mod tests {
 
         assert_eq!(a.mul(&b), XY::new(20, 24));
         assert_eq!(a.mul(&b), b.mul(&a));
+    }
+
+    #[test]
+    fn xy_smul() {
+        let a = XY::new(5, 8);
+
+        assert_eq!(a.smul(2), XY::new(10, 16));
     }
 
 
@@ -272,5 +285,20 @@ mod tests {
         assert_eq!(grid.is_within(&XY::new(4, 2)), true);
         assert_eq!(grid.is_within(&XY::new(0, -1)), false);
         assert_eq!(grid.is_within(&XY::new(-1, 0)), false);
+    }
+
+
+    #[test]
+    fn grid_neighbours() {
+        let input: Vec<String> = vec![
+            "..#A#",
+            ".....",
+            "#.c.#",
+        ].iter().map(|s| s.to_string()).collect();
+        
+        let grid = Grid::from_input(input.into_iter());
+
+        assert_eq!(grid.neighbours(&XY::new(2, 1)),
+            vec![XY::new(2, 0), XY::new(3, 1), XY::new(2, 2), XY::new(1, 1)]);
     }
 }
